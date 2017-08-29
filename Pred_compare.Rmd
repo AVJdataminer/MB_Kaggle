@@ -1,0 +1,46 @@
+---
+title: "Compare MB fits"
+author: "Aiden V Johnson"
+date: "6/29/2017"
+output: html_document
+---
+
+Plot densities of MB submissions with training density and submission scores.
+
+```{r}
+files = list.files(pattern="predictions")
+library(readr)
+library(dplyr)
+tbl2 = lapply(files, read_csv) %>% bind_rows()
+names(tbl)=paste0(names(tbl),".",gsub("*.csv","",files),sep="")
+tbl2 = lapply(files, read_csv) %>% bind_rows()
+tbl2$models=cbind(rep(paste(gsub("*.csv","",files)),4209))
+tb3=data.frame(Ftrain$ID,Ftrain$y,rep("train",4209))
+names(tb3)=names(tbl2)
+tbl4=rbind(tbl2,tb3)
+
+p=ggplot(tbl2, aes(x=y)) + geom_density(aes(group=models, colour=models))+
+  xlim(c(70,130))+geom_density(aes(x=y),data = tb3)+facet_wrap(~as.factor(models))
+p
+```
+
+You can also embed plots, for example:
+
+```{r, echo=FALSE}
+tbl4$models=as.factor(tbl4$models)
+plotd=data.frame(filter(tbl4,models=='ELMNN_predictions'|models=='Second_predictions_MB'))
+p=ggplot(tbl4, aes(x=ID,y=y)) + geom_point(aes(group=models, colour=models))
+p
+p=ggplot(plotd, aes(x=ID,y=y)) + geom_point(aes(group=models, colour=models))
+p
+#multiply low predictions by 10
+
+small=filter(ELMNN_predictions.csv,y<1)
+range(ELMNN_predictions.csv$y)
+range(Ftrain$y)
+range(Second_predictions_MB.csv$y)
+range(Fithpredictions.csv$y)
+range(Fourth_predictions_MB.csv$y)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
